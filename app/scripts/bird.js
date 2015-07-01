@@ -1,3 +1,5 @@
+'use strict';
+
 import THREE from 'three';
 import TweenMax from 'gsap';
 
@@ -90,8 +92,12 @@ class Bird {
 		this.leftWingMesh.position.y = 80;
 		this.leftWingMesh.position.z = 0;
 		this.threeGroup.add(this.leftWingMesh);
+
+		// scale up to 2
+		this.threeGroup.scale.set(2, 2, 2);
 	}
 
+	// blink eyes
 	blink() {
 		TweenMax.to(this.leftPupilMesh.scale, 0.3, { y:0.1, ease: Power2.easeInOut, repeat: 1, yoyo: true });
 		TweenMax.to(this.rightPupilMesh.scale, 0.3, { y:0.1, ease: Power2.easeInOut, repeat: 1, yoyo: true });
