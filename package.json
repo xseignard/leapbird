@@ -1,0 +1,42 @@
+{
+  "name": "leapbird",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xseignard/leapbird.git"
+  },
+  "author": "Xavier Seignard <xavier.seignard@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xseignard/leapbird/issues"
+  },
+  "homepage": "https://github.com/xseignard/leapbird#readme",
+  "dependencies": {
+    "gsap": "^1.17.0",
+    "leapjs": "^0.6.4",
+    "leapjs-plugins": "^0.1.11",
+    "three": "^0.71.0",
+    "three-orbit-controls": "^69.0.4"
+  },
+  "devDependencies": {
+    "babelify": "^6.1.2",
+    "browser-sync": "^2.7.12",
+    "browserify": "^10.2.4",
+    "del": "^1.2.0",
+    "gulp": "^3.9.0",
+    "gulp-jshint": "^1.11.0",
+    "gulp-sass": "^2.0.1",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-uglify": "^1.2.0",
+    "gulp-util": "^3.0.6",
+    "lodash": "^3.9.3",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.2.3"
+  }
+}
