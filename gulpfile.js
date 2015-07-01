@@ -1,19 +1,44 @@
-'use strict';
-
 var gulp = require('gulp'),
 	jshint = require('gulp-jshint'),
-	uglify = require('gulp-uglify'),
+	del = require('del'),
+	sass = require('gulp-sass'),
 	gutil = require('gulp-util'),
 	source = require('vinyl-source-stream'),
-	buffer = require('vinyl-buffer'),
-	del = require('del'),
-	browserify = require('browserify'),
-	watchify = require('watchify'),
+	uglify = require('gulp-uglify'),
 	babelify = require('babelify'),
-	sass = require('gulp-sass'),
+	watchify = require('watchify'),
+	exorcist = require('exorcist'),
 	sourcemaps = require('gulp-sourcemaps'),
-	_ = require('lodash'),
+	browserify = require('browserify'),
 	browserSync = require('browser-sync').create();
+
+
+// Browserify + watchify for faster builds
+// ----------------------------------------
+watchify.args.debug = true;
+var bundler = watchify(browserify('./app/scripts/app.js', watchify.args));
+bundler.transform(babelify.configure({
+	sourceMapRelative: './app/scripts'
+}));
+bundler.on('update', bundle);
+
+function bundle() {
+	gutil.log('Compiling JS...');
+	return bundler.bundle()
+		.on('error', function (err) {
+			gutil.log(err.message);
+			browserSync.notify('Browserify Error!');
+			this.emit('end');
+		})
+		.pipe(exorcist('./dist/scripts/app.js.map'))
+		.pipe(source('app.js'))
+		//.pipe(uglify())
+		.pipe(gulp.dest('./dist/scripts'))
+		.pipe(browserSync.stream({once: true}));
+}
+gulp.task('bundle', function () {
+	return bundle();
+});
 
 // Clean
 // ----------------------------------------
@@ -27,7 +52,7 @@ gulp.task('styles', function() {
 	return gulp.src('./app/styles/**/*.scss')
 	.pipe(sourcemaps.init())
 	.pipe(sass())
-	.pipe(sourcemaps.write())
+	.pipe(sourcemaps.write('.'))
 	.pipe(gulp.dest('./dist/styles'));
 });
 
@@ -45,61 +70,12 @@ gulp.task('copy', function() {
 	.pipe(gulp.dest('./dist'));
 });
 
-// Browserify + watchify for faster builds
-// ----------------------------------------
-var customOpts = {
-	entries: ['./app/scripts/app.js'],
-	debug: true
-};
-var opts = _.assign({}, watchify.args, customOpts);
-var b = watchify(browserify(opts));
-b.transform(babelify);
-b.on('update', bundle);
-b.on('log', gutil.log);
-
-function bundle(prod) {
-	gutil.log('Compiling JS...');
-
-	if (prod) {
-		return b.bundle()
-		.pipe(source('app.js'))
-		.pipe(buffer())
-		.pipe(sourcemaps.init({ loadMaps: true }))
-		.pipe(uglify())
-		.pipe(sourcemaps.write('./'))
-		.pipe(gulp.dest('./dist/scripts'));
-	}
-	else {
-		return b.bundle()
-		.pipe(source('app.js'))
-		.pipe(buffer())
-		.pipe(sourcemaps.init({ loadMaps: true }))
-		.pipe(sourcemaps.write('./'))
-		.pipe(gulp.dest('./dist/scripts'))
-		.pipe(browserSync.reload({stream: true}));
-	}
-}
-
-gulp.task('js:dev', function () {
-	return bundle(false);
-});
-
-gulp.task('js:prod', function () {
-	return bundle(true);
-});
-// Build pipeline
-// ----------------------------------------
-gulp.task('build', ['clean', 'styles', 'lint', 'copy', 'js:prod'], function() {
-	return gutil.log('Done building');
-});
-
-// Watchers
-// -------------------------------------------------
-gulp.task('watch', ['clean', 'styles', 'lint', 'copy', 'js:dev'], function() {
+/**
+ * First bundle, then serve from the ./app directory
+ */
+gulp.task('default', ['clean', 'lint', 'styles', 'copy', 'bundle'], function () {
 	browserSync.init({
-		server: {
-			baseDir: './dist',
-		}
+		server: './dist'
 	});
 	gulp.watch(['./app/*.html', './app/images/**'], ['copy']);
 	gulp.watch(['./app/styles/**/*.scss'], ['styles']);

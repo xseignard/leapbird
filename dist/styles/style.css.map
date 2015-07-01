@@ -1,0 +1,1 @@
+{"version":3,"sources":["style.scss"],"names":[],"mappings":"AAAA,IAAI,CAAC;EACJ,MAAM,EAAE,CAAE;EACV,KAAK,EAAE,IAAK;EACZ,MAAM,EAAE,IAAK;EACb,QAAQ,EAAE,MAAO;EACjB,gBAAgB,EAAE,OAAQ,GALrB","file":"style.css","sourcesContent":["body {\n\tmargin: 0;\n\twidth: 100%;\n\theight: 100%;\n\toverflow: hidden;\n\tbackground-color: #0e0e0e;\n}\n"],"sourceRoot":"/source/"}

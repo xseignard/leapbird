@@ -30,16 +30,14 @@ class Scene {
 		let container = document.getElementById(options.container || 'world');
 		container.appendChild(this.renderer.domElement);
 		// handle window resize
-		window.addEventListener('resize', this.onWindowResize, false);
-	}
-
-	// handle resizing
-	onWindowResize() {
-		this.height = window.innerHeight;
-		this.width = window.innerWidth;
-		this.renderer.setSize(this.width, this.height);
-		this.camera.aspect = this.width / this.height;
-		this.camera.updateProjectionMatrix();
+		let _this = this;
+		window.addEventListener('resize', function() {
+			_this.height = window.innerHeight;
+			_this.width = window.innerWidth;
+			_this.renderer.setSize(_this.width, _this.height);
+			_this.camera.aspect = _this.width / _this.height;
+			_this.camera.updateProjectionMatrix();
+		}, false);
 	}
 
 	// shorthand to THREE.scene().add()

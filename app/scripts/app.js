@@ -5,8 +5,15 @@ import Scene from './scene.js';
 import Bird from './bird.js';
 import FrameHandler from './frameHandler.js';
 
-// scene
-var scene, bird, frameHandler;
+// scene stuff
+var scene,
+	bird,
+	canBlink = true;
+
+// leap stuff
+var frameHandler,
+	leftAngle,
+	rightAngle;
 
 function init() {
 	scene = new Scene();
@@ -54,8 +61,6 @@ function createBird(){
 	scene.add(bird.threeGroup);
 }
 
-var leftAngle, rightAngle, up = new THREE.Vector3(0, 1, 0);
-
 function startTracking() {
 	frameHandler = new FrameHandler();
 	frameHandler.on('pos', function(pos) {
@@ -63,8 +68,6 @@ function startTracking() {
 		rightAngle = pos.rightAngle;
 	});
 }
-
-var canBlink = true;
 
 function loop(ts){
 	var timedAngle = Math.sin(ts/500);
