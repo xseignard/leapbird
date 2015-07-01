@@ -54,38 +54,53 @@ var customOpts = {
 var opts = _.assign({}, watchify.args, customOpts);
 var b = watchify(browserify(opts));
 b.transform(babelify);
-b.on('update', function() { bundle(); browserSync.reload(); });
+b.on('update', bundle);
 b.on('log', gutil.log);
 
-function bundle() {
-	return b.bundle()
-	.pipe(source('app.js'))
-	.pipe(buffer())
-	.pipe(sourcemaps.init({ loadMaps: true }))
-	.pipe(uglify())
-	.pipe(sourcemaps.write('./'))
-	.pipe(gulp.dest('./dist/scripts'));
-}
-bundle();
-gulp.task('js', bundle);
+function bundle(prod) {
+	gutil.log('Compiling JS...');
 
+	if (prod) {
+		return b.bundle()
+		.pipe(source('app.js'))
+		.pipe(buffer())
+		.pipe(sourcemaps.init({ loadMaps: true }))
+		.pipe(uglify())
+		.pipe(sourcemaps.write('./'))
+		.pipe(gulp.dest('./dist/scripts'));
+	}
+	else {
+		return b.bundle()
+		.pipe(source('app.js'))
+		.pipe(buffer())
+		.pipe(sourcemaps.init({ loadMaps: true }))
+		.pipe(sourcemaps.write('./'))
+		.pipe(gulp.dest('./dist/scripts'))
+		.pipe(browserSync.reload({stream: true}));
+	}
+}
+
+gulp.task('js:dev', function () {
+	return bundle(false);
+});
+
+gulp.task('js:prod', function () {
+	return bundle(true);
+});
 // Build pipeline
 // ----------------------------------------
-gulp.task('pipeline', ['clean', 'styles', 'lint', 'copy', 'js']);
-
-// BrowserSync
-// ----------------------------------------
-gulp.task('browserSync', function () {
-	return browserSync.init({
-		server: {
-			baseDir: './dist',
-		}
-	});
+gulp.task('build', ['clean', 'styles', 'lint', 'copy', 'js:prod'], function() {
+	return gutil.log('Done building');
 });
 
 // Watchers
 // -------------------------------------------------
-gulp.task('watch', ['browserSync'], function() {
+gulp.task('watch', ['clean', 'styles', 'lint', 'copy', 'js:dev'], function() {
+	browserSync.init({
+		server: {
+			baseDir: './dist',
+		}
+	});
 	gulp.watch(['./app/*.html', './app/images/**'], ['copy']);
 	gulp.watch(['./app/styles/**/*.scss'], ['styles']);
 });
